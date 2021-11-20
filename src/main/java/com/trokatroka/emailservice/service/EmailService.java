@@ -30,6 +30,9 @@ public class EmailService {
 
     public Email sendEmail(Email email) {
         email.setDate(LocalDateTime.now());
+        if(signUpEmailRepository.findByEmail(email.getMailTo()).isPresent()) {
+            throw new ValidationException();
+        }
         String htmlTemplate = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "  <head>\n" +
@@ -51,12 +54,8 @@ public class EmailService {
                 "    <title></title>\n" +
                 "  </head>\n" +
                 "  <body>\n" +
-                "    <div id=\"root\" style=\"background-color: #f8f8f8; width: 600px; height: 100%\">\n" +
-                "      <svg width=\"60\" height=\"60\"\n" +
-                "           xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n" +
-                "        <image width=\"60\" height=\"60\" href=\"https://trokatroka.com/static/media/logo.b17ef21b.svg\"/>\n" +
-                "      </svg>\n" +
-                "      <div style=\"display: flex; flex-direction: column; justify-content: center; margin: 0 0 0 10px;\">\n" +
+                "    <div id=\"root\" style=\"background-color: #f8f8f8; width: 100%; height: 100%\">\n" +
+                "      <div style=\"margin: 0 0 0 10px;\">\n" +
                 "        <h1> Olá, <span style=\"font-weight: bold\">{$nome$}</span></h1>\n" +
                 "        <p>{$message$}</p>\n" +
                 "        <br><br><br><br>\n" +
@@ -65,7 +64,7 @@ public class EmailService {
                 "      </div>\n" +
                 "    </div>\n" +
                 "  </body>\n" +
-                "</html>\n";
+                "</html>";
         try {
             MimeMessage mimeMessage = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
@@ -88,11 +87,8 @@ public class EmailService {
                 signUpEmail.setEmail(email.getMailTo());
                 signUpEmail.setName(email.getUserName());
                 signUpEmail.setDataCadastro(LocalDateTime.now());
-                if(signUpEmailRepository.findByEmail(signUpEmail.getEmail()).isPresent()) {
-                    throw new ValidationException();
-                } else {
-                    signUpEmailRepository.save(signUpEmail);
-                }
+
+                signUpEmailRepository.save(signUpEmail);
 
                 break;
         }

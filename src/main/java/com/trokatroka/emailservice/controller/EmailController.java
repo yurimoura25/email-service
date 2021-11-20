@@ -14,7 +14,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/email")
-@CrossOrigin(origins = "https://trokatroka.com")
+@CrossOrigin(origins = {"https://trokatroka.com", "https://www.trokatroka.com"})
 public class EmailController {
 
     @Autowired
